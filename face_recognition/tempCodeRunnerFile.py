@@ -1,19 +1,14 @@
 import os.path
-import pickle
+import subprocess
 import tkinter as tk
 import cv2
 import util
 import datetime
 from PIL import Image, ImageTk
-import face_recognition
-
-from test import test
-
-
 
 class App:
     def __init__(self):
-        self.main_window = tk.Tk()  
+        self.main_window = tk.Tk()
         self.main_window.geometry("1200x520+350+100")
 
         self.login_button_main_window = util.get_button(self.main_window, 'Login', 'green', self.login)
@@ -58,27 +53,21 @@ class App:
 
 
     def login(self):
-        label = test(image =self.most_recent_capture_arr,
-                model_dir = 'C:\\Users\\hp\\Desktop\\face_recognition\\Silent_Face_Anti_Spoofing\\resources\\anti_spoof_models',
-                device_id = 0
-                )
-        if label == 1:
+        unknown_img_path = './.tmp.jpg'
+        cv2.imwrite(unknown_img_path, self.most_recent_capture_arr)
+        output = str(subprocess.check_output(['face_recognition', self.db_dir, unknown_img_path]))
+        name = output.split(',')[1][:-5]
+        print(name)
 
-            name = util.recognize(self.most_recent_capture_arr, self.db_dir)
-
-            if name in ['unknown_person', 'no_persons_found']:
-                util.msg_box('Opps....', 'Unknown User. Please register first or try again')
-            else:
-                util.msg_box('Welcome Back !', 'Welcome, {}.'.format(name))
-                with open(self.log_path, 'a') as f:
-                    f.write('{},{}\n'.format(name, datetime.datetime.now()))
-                    f.close()   
-
+        if name in ['unknown_person', 'no_persons_found']:
+            util.msg_box('Opps....', 'Unknown User. Please register first or try again')
         else:
-            util.msg_box('Hey, you are spoofer!','You are fake Bruh!!')
+            util.msg_box('Welcome Back !', 'Welcome, {}.'.format(name))
+            with open(self.log_path, 'a') as f:
+                f.write('{},{}\n'.format(name, datetime.datetime.now()))
+                f.close()
 
-        
-
+        os.remove(unknown_img_path)
 
 
     def register_new_user(self):
@@ -123,22 +112,14 @@ class App:
     def accept_register_new_user(self):
         name = self.entry_text_register_new_user.get(1.0, "end-1c")
 
-        # Get face encodings
-        face_encodings_list = face_recognition.face_encodings(self.register_new_user_capture)
+        cv2.imwrite(os.path.join(self.db_dir, '{}.jpg'.format(name)),self.register_new_user_capture)
 
-        if len(face_encodings_list) > 0:
-            # Take the first face encoding in the list
-            embeddings = face_encodings_list[0]
+        util.msg_box('Success!','User registered successfully !')
+        self.register_new_user_window.destroy()
 
-            # Save the face embedding to a file
-            file_path = os.path.join(self.db_dir, '{}.pickle'.format(name))
-            with open(file_path, 'wb') as file:
-                pickle.dump(embeddings, file)
 
-            util.msg_box('Success!', 'User registered successfully!')
-            self.register_new_user_window.destroy()
-        else:
-            util.msg_box('Error', 'No face detected. Please try again.')
+
+
 
 
 if __name__ == "__main__":
