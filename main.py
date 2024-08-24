@@ -61,7 +61,7 @@ class App:
 
     def login(self):
         label = test(image =self.most_recent_capture_arr,
-                model_dir = '/home/zoro/Desktop/Face-Recognition/face_recognition/Silent_Face_Anti_Spoofing/resources/anti_spoof_models',
+                model_dir = '/home/zoro/Desktop/Face-Recognition/Silent_Face_Anti_Spoofing/resources/anti_spoof_models',
                 device_id = 0
                 )
         if label == 1:
