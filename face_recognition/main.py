@@ -6,10 +6,12 @@ import util
 import datetime
 from PIL import Image, ImageTk
 import face_recognition
+import sys
 
-from test import test
+from Silent_Face_Anti_Spoofing.test import test
 
-
+sys.path.append(os.path.dirname(__file__))
+    
 
 class App:
     def __init__(self):
@@ -59,7 +61,7 @@ class App:
 
     def login(self):
         label = test(image =self.most_recent_capture_arr,
-                model_dir = 'C:\\Users\\hp\\Desktop\\face_recognition\\Silent_Face_Anti_Spoofing\\resources\\anti_spoof_models',
+                model_dir = '/home/zoro/Desktop/Face-Recognition/face_recognition/Silent_Face_Anti_Spoofing/resources/anti_spoof_models',
                 device_id = 0
                 )
         if label == 1:
